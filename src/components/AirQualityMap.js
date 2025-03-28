@@ -80,7 +80,7 @@ export default function AirQualityMap() {
     async function fetchData() {
         try {
             const sensorLocations = await fetchCSV("/data/sensor_locations.csv");
-            const airQualityData = await fetchCSV("/data/123.csv");
+            const airQualityData = await fetchCSV("/data/air_quality_data.csv");
 
             const locationMap = Object.fromEntries(
                 sensorLocations.map(([id, lat, lon]) => [
