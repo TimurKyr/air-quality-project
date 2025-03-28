@@ -3,14 +3,16 @@
 import React, { useState, useEffect } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 
-const Weather = () => {
+export default function Weather() {
     const [weatherData, setWeatherData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // Runs immediately when website loads
     useEffect(() => {
         const fetchWeather = async () => {
             try {
+                // Getting weather info from openweathermap API
                 const response = await fetch(
                     `https://api.openweathermap.org/data/2.5/weather?q=Almaty,KZ&units=metric&appid=b7887f62e5f98e29c27718b583698dae`
                 );
@@ -19,6 +21,7 @@ const Weather = () => {
                 }
                 const data = await response.json();
                 
+                // Translation to show info in Russian
                 const weatherTranslation = {
                     Clear: "Ясно",
                     Clouds: "Облачно",
@@ -45,7 +48,7 @@ const Weather = () => {
                     sunset: new Date(data.sys.sunset * 1000).toLocaleTimeString("ru-RU"),
                     description: weatherTranslation[data.weather[0].main] || "Неизвестно",
                 });
-                setLoading(false);
+                setLoading(false);  // Weather is ready to show
             } catch (err) {
                 setError(err.message);
                 setLoading(false);
@@ -64,40 +67,40 @@ const Weather = () => {
     if (error) return <p>Ошибка: {error}</p>;
 
     return (
-        <div style={styles.container}>
-            <div style={styles.weatherContainer}>
-                <div style={styles.leftSection}>
-                    <div style={styles.iconSection}>
-                        <span style={styles.icon}>{WeatherIcons.temperature}</span>
-                        <div>
-                            <span style={styles.BigText}>{Math.round(weatherData.temperature)}°C</span>
-                        </div>
-                    </div>
-                    <div style={styles.iconSection}>
-                        <span style={styles.icon}>{WeatherIcons.wind}</span>
-                        <div>
-                            <span style={styles.BigText}>{weatherData.windSpeed} км/ч</span>
-                        </div>
+        <div style={styles.weatherContainer}>
+            {/* Section with temperature and wind speed */}
+            <div style={styles.leftSection}>
+                <div style={styles.iconSection}>
+                    <span style={styles.icon}>{WeatherIcons.temperature}</span>
+                    <div>
+                        <span style={styles.BigText}>{Math.round(weatherData.temperature)}°C</span>
                     </div>
                 </div>
+                <div style={styles.iconSection}>
+                    <span style={styles.icon}>{WeatherIcons.wind}</span>
+                    <div>
+                        <span style={styles.BigText}>{weatherData.windSpeed} км/ч</span>
+                    </div>
+                </div>
+            </div>
 
-                <div style={styles.rightSection}>
-                    <div style={styles.rightSectionText}>
-                        <p>Осадки:</p>
-                        <p><strong>{weatherData.precipitation}</strong></p>
-                    </div>
-                    <div style={styles.rightSectionText}>
-                        <p>Влажность:</p>
-                        <p><strong>{weatherData.humidity}%</strong></p>
-                    </div>
-                    <div style={styles.rightSectionText}>
-                        <p>Восход:</p>
-                        <p><strong>{weatherData.sunrise}</strong></p>
-                    </div>
-                    <div style={styles.rightSectionText}>
-                        <p>Закат:</p>
-                        <p><strong>{weatherData.sunset}</strong></p>
-                    </div>
+            {/* Section with additional weather information */}
+            <div style={styles.rightSection}>
+                <div style={styles.rightSectionText}>
+                    <p>Осадки:</p>
+                    <p><strong>{weatherData.precipitation}</strong></p>
+                </div>
+                <div style={styles.rightSectionText}>
+                    <p>Влажность:</p>
+                    <p><strong>{weatherData.humidity}%</strong></p>
+                </div>
+                <div style={styles.rightSectionText}>
+                    <p>Время Восхода:</p>
+                    <p><strong>{weatherData.sunrise}</strong></p>
+                </div>
+                <div style={styles.rightSectionText}>
+                    <p>Время Заката:</p>
+                    <p><strong>{weatherData.sunset}</strong></p>
                 </div>
             </div>
         </div>
@@ -105,12 +108,6 @@ const Weather = () => {
 };
 
 const styles = {
-    container: {
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "left",
-        marginBottom: "50px",
-    },
     weatherContainer: {
         display: "flex",
         justifyContent: "space-around",
@@ -143,8 +140,6 @@ const styles = {
         justifyContent: "space-between",
         alignItems: "center",
         padding: "8px 0",
-        borderBottom: "1px solid #ccc",
+        borderBottom: "1px solid #ccc", // gray line below each line
     },
 };
-
-export default Weather;

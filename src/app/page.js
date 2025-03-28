@@ -3,8 +3,9 @@
 import dynamic from "next/dynamic";
 import Weather from "../components/Weather";
 
+// Importing AirQualityMap component
 const AirQualityMap = dynamic(() => import("../components/AirQualityMap"), {
-  ssr: false,
+  ssr: false, // Rendering map on the client side, not on server
 });
 
 export default function Home() {
@@ -14,6 +15,7 @@ export default function Home() {
         <p style={styles.title}>ТЕКУЩАЯ ПОГОДА В АЛМАТЫ</p>
       </div>
       <Weather />
+      
       <div>
         <p style={styles.title}>КАРТА КАЧЕСТВА ВОЗДУХА АЛМАТЫ</p>
       </div>

@@ -18,41 +18,36 @@ async function fetchCSV(filePath) {
     return rows.map(row => row.split(",").map(cell => cell.trim()));
 }
 
-function getScore(value, norm, weight = 2) {
-    if (value > 2 * norm) return 6 * weight;  // Severe pollution
-    if (value > 1.5 * norm) return 4 * weight;  // Moderate pollution
-    if (value > 1.1 * norm) return 2 * weight;  // Slightly above norm
-    if (value >= 0.8 * norm) return 1 * weight; // Expanded yellow range
-    return 0; // Green
-}
-
 // WHO Norms for pollutants (values in µg/m³)
 const WHO_NORMS = {
-    so2: 20, // µg/m³
-    co: 10000, // µg/m³
-    no2: 40, // µg/m³
-    formaldehyde: 10 // µg/m³
+    so2: 20,
+    co: 10000,
+    no2: 40,
+    formaldehyde: 10,
 };
+
+// Function to get score of each pollutant
+function getScore(value, norm, weight = 2) {
+    if (value > 2 * norm) return 6 * weight;  // severe pollution
+    if (value > 1.5 * norm) return 4 * weight;  // moderate pollution
+    if (value > 1.1 * norm) return 2 * weight;  // slightly above norm
+    if (value >= 0.8 * norm) return 1 * weight; // expanded yellow range
+    return 0; // good
+}
 
 function getMarkerColor(so2, co, no2, formaldehyde) {
     let quality = 0;
 
-    // Calculate scores for each pollutant
-    quality += getScore(so2, WHO_NORMS.so2, 2.5);
-    quality += getScore(co, WHO_NORMS.co, 2.5);
-    quality += getScore(no2, WHO_NORMS.no2, 3.5); // Higher impact
-    quality += getScore(formaldehyde, WHO_NORMS.formaldehyde, 3.5); // Higher impact
+    // Calculating scores for each pollutant
+    quality += getScore(so2, WHO_NORMS.so2, 2.5);   // lower impact
+    quality += getScore(co, WHO_NORMS.co, 2.5);     // lower impact
+    quality += getScore(no2, WHO_NORMS.no2, 3.5);   // higher impact
+    quality += getScore(formaldehyde, WHO_NORMS.formaldehyde, 3.5); // higher impact
 
     // Determine marker color
     if (quality < 6) return "green";  // Low pollution
     if (quality >= 6 && quality < 10) return "yellow"; // Moderate pollution
     return "red"; // High pollution
-}
-
-function getFinalQualityLabel(score) {
-    if (score < 6) return "Ниже нормы";
-    if (score >= 6 && score < 10) return "Немного выше нормы";
-    return "Превышает норму";
 }
 
 const calculateTotalScore = (sensor) => {
@@ -63,6 +58,13 @@ const calculateTotalScore = (sensor) => {
         getScore(sensor.formaldehyde, WHO_NORMS.formaldehyde, 3)
     );
 };
+
+// Final label of the mark according to score
+function getFinalQualityLabel(score) {
+    if (score < 6) return "Ниже нормы";
+    if (score >= 6 && score < 10) return "Немного выше нормы";
+    return "Превышает норму";
+}
 
 function getPollutionStatus(value, norm) {
     if (value < 0.8 * norm) return "Ниже нормы";
@@ -77,6 +79,7 @@ export default function AirQualityMap() {
     const [mapCenter, setMapCenter] = useState([43.24, 76.92]);
     const [map, setMap] = useState(null);
 
+    // Function for getting sensor data for chosen date
     async function fetchData() {
         try {
             const sensorLocations = await fetchCSV("/data/sensor_locations.csv");
@@ -92,12 +95,13 @@ export default function AirQualityMap() {
             const formattedSelectedDate = selectedDate.toLocaleDateString("en-CA");
 
             let formattedParsedData = [];
-
+            
+            // Getting data for chosen date
             const parsedData = airQualityData.filter(([date]) => {
-                console.log(date);
                 return date.trim() === formattedSelectedDate;
             });
 
+            // If data exists
             if (parsedData.length > 0) {
                 console.log("Parsed Data:", parsedData);
                 formattedParsedData = parsedData.map(([date, sensorId, so2, co, no2, formaldehyde]) => {
@@ -118,8 +122,10 @@ export default function AirQualityMap() {
                     };
                 }).filter(sensor => sensor.latitude && sensor.longitude);
 
+                // Saving sensors' data
                 setSensorData([...formattedParsedData]);
                 
+                // If sensor was selected, then date was changed
                 if (selectedSensor) {
                     const updatedSensor = formattedParsedData.find(sensor => sensor.sensorId === selectedSensor.sensorId);
                     if (updatedSensor) {
@@ -140,6 +146,7 @@ export default function AirQualityMap() {
         }
     }
 
+    // Runs when either map was initialized or date was changed
     useEffect(() => {
         if (map && selectedDate) {
             console.log(map)
@@ -148,23 +155,15 @@ export default function AirQualityMap() {
         }
     }, [selectedDate, map]);
 
+    // Function to draw markers and areas around them
+    // Runs when sensors' data was successfully fetched
     useEffect(() => {
-        if (map) {
-            console.log(map);
-            map.scrollWheelZoom.disable();
-            map.dragging.disable();
-            map.touchZoom.disable();
-            map.doubleClickZoom.disable();
-            map.boxZoom.disable();
-            map.keyboard.disable();
-            map.options.zoomControl = false;
-        }
-
         if (!map) {
             console.warn("⚠️ mapRef.current is NULL. Waiting for initialization...");
             return;
         }
 
+        // Cleaning map
         map.eachLayer((layer) => {
             if (!(layer instanceof L.TileLayer)) {
                 map.removeLayer(layer);
@@ -187,6 +186,7 @@ export default function AirQualityMap() {
                     return;
                 }
 
+                // Drawing the areas for markers
                 const canvas = document.createElement("canvas");
                 const ctx = canvas.getContext("2d");
                 canvas.width = 400;
@@ -216,6 +216,7 @@ export default function AirQualityMap() {
                     [sensor.latitude - 0.05, sensor.longitude + 0.05]
                 ], { pane: "overlayPane", interactive: true }).addTo(overlayLayer);
 
+                // Runs when user clickes on any area
                 overlay.on("click", (e) => {
                     console.log("Overlay clicked:", e.latlng);
                     const closestSensor = sensorData.reduce((closest, sensor) => {
@@ -228,6 +229,7 @@ export default function AirQualityMap() {
                     }
                 });
 
+                // Drawing the markers
                 L.marker([sensor.latitude, sensor.longitude], {
                     icon: new L.Icon({
                         iconUrl: `/marker-icon-${sensor.color}.png`,
@@ -268,8 +270,8 @@ export default function AirQualityMap() {
                 center={mapCenter} 
                 zoom={12}
                 style={{ height: "500px", width: "100%", marginTop: "30px" }}
-                scrollWheelZoom={false}
-                dragging={false}
+                scrollWheelZoom={false} // user can't zoom the map
+                dragging={false}    // user can't move the map
                 zoomControl={false}
                 doubleClickZoom={false}
                 touchZoom={false}
@@ -289,6 +291,7 @@ export default function AirQualityMap() {
                 />
             </div>
             
+            {/* Section for showing the advanced information about the sensor */}
             {selectedSensor && (
                 <div style={{ textAlign: "center", marginTop: "20px", padding: "15px 40px", background: "#f9f9f9", borderRadius: "8px", boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)" }}>
                 <h3>Подробная информация о датчике</h3>
