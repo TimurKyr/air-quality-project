@@ -268,7 +268,7 @@ export default function AirQualityMap() {
         <div style={styles.container}>
             <MapContainer 
                 center={mapCenter} 
-                zoom={12}
+                zoom={11.5}
                 style={{ height: "500px", width: "100%", marginTop: "30px" }}
                 scrollWheelZoom={false} // user can't zoom the map
                 dragging={false}    // user can't move the map
