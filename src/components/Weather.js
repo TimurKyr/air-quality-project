@@ -69,7 +69,7 @@ export default function Weather() {
     return (
         <div style={styles.weatherContainer}>
             {/* Section with temperature and wind speed */}
-            <div style={styles.leftSection}>
+            <div style={styles.topSection}>
                 <div style={styles.iconSection}>
                     <span style={styles.icon}>{WeatherIcons.temperature}</span>
                     <div>
@@ -85,20 +85,20 @@ export default function Weather() {
             </div>
 
             {/* Section with additional weather information */}
-            <div style={styles.rightSection}>
-                <div style={styles.rightSectionText}>
+            <div style={styles.bottomSection}>
+                <div style={styles.bottomSectionText}>
                     <p>Осадки:</p>
                     <p><strong>{weatherData.precipitation}</strong></p>
                 </div>
-                <div style={styles.rightSectionText}>
+                <div style={styles.bottomSectionText}>
                     <p>Влажность:</p>
                     <p><strong>{weatherData.humidity}%</strong></p>
                 </div>
-                <div style={styles.rightSectionText}>
+                <div style={styles.bottomSectionText}>
                     <p>Время Восхода:</p>
                     <p><strong>{weatherData.sunrise}</strong></p>
                 </div>
-                <div style={styles.rightSectionText}>
+                <div style={styles.bottomSectionText}>
                     <p>Время Заката:</p>
                     <p><strong>{weatherData.sunset}</strong></p>
                 </div>
@@ -110,17 +110,21 @@ export default function Weather() {
 const styles = {
     weatherContainer: {
         display: "flex",
-        justifyContent: "space-around",
+        flexDirection: "column",
         alignItems: "center",
+        width: "100%",
+        gap: "30px",
     },
-    leftSection: {
+    topSection: {
         display: "flex",
         flexDirection: "column",
+        alignItems: "center",
+        width: "80%",
     },
     iconSection: {
         display: "flex",
         flexDirection: "row",
-        alignItems: "center",
+        alignItems: "left",
     },
     icon: {
         fontSize: "60px",
@@ -130,16 +134,17 @@ const styles = {
         fontWeight: "bold",
         fontSize: "50px",
     },
-    rightSection: {
+    bottomSection: {
         textAlign: "left",
+        alignItems: "center",
         fontSize: "16px",
-        width: "40%",
+        width: "80%",
     },
-    rightSectionText: {
+    bottomSectionText: {
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
         padding: "8px 0",
-        borderBottom: "1px solid #ccc", // gray line below each line
+        borderBottom: "1px solid #ccc",
     },
 };

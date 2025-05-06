@@ -242,19 +242,61 @@ export default function AirQualityMap() {
                     pane: "markerPane",
                     zIndexOffset: 50
                 }).addTo(markerLayer).bindPopup(`
-                    <strong>Датчик ${sensor.sensorId}</strong><br />
-                    Итоговая оценка: ${getFinalQualityLabel(calculateTotalScore(sensor))}
-                `).on("click", (e) => {
-                    console.log("Marker clicked:", e.latlng);
-                    const closestSensor = sensorData.reduce((closest, sensor) => {
-                        const distance = map.distance(e.latlng, L.latLng(sensor.latitude, sensor.longitude));
-                        return distance < closest.distance ? { sensor, distance } : closest;
-                    }, { sensor: null, distance: Infinity }).sensor;
+                    <div style="max-width: 300px; display: flex; flex-direction: column">
+                        <strong style="text-align: center;">Датчик ${sensor.sensorId}</strong><br />
+                        
+                        <div style="display: flex; justify-content: space-between;">
+                            <div style="display: flex; flex-direction: column; width: 70%;">
+                                <p style="margin: 0"><strong>SO₂:</strong> ${sensor.so2} µg/m³</p>
+                                Норма ВОЗ: ${WHO_NORMS.so2} µg/m³
+                            </div>
+                            <div style="width: 30%; display: flex; align-items: center; justify-content: end; text-align: end;">
+                                <em>${getPollutionStatus(sensor.so2, WHO_NORMS.so2)}</em>
+                            </div>
+                        </div>
 
-                    if (closestSensor) {
-                        setSelectedSensor(closestSensor);
-                    }
-                });
+                        <br />
+                        <div style="display: flex; justify-content: space-between;">
+                            <div style="display: flex; flex-direction: column; width: 70%;">
+                                <p style="margin: 0"><strong>CO:</strong> ${sensor.co} µg/m³</p>
+                                Норма ВОЗ: ${WHO_NORMS.co} µg/m³
+                            </div>
+                            <div style="width: 30%; display: flex; align-items: center; justify-content: end; text-align: end;">
+                                <em>${getPollutionStatus(sensor.co, WHO_NORMS.co)}</em>
+                            </div>
+                        </div>
+
+                        <br />
+                        <div style="display: flex; justify-content: space-between;">
+                            <div style="display: flex; flex-direction: column; width: 70%;">
+                                <p style="margin: 0"><strong>NO₂:</strong> ${sensor.no2} µg/m³</p>
+                                Норма ВОЗ: ${WHO_NORMS.no2} µg/m³
+                            </div>
+                            <div style="width: 30%; display: flex; align-items: center; justify-content: end; text-align: end;">
+                                <em>${getPollutionStatus(sensor.no2, WHO_NORMS.no2)}</em>
+                            </div>
+                        </div>
+
+                        <br />
+
+                        <div style="display: flex; justify-content: space-between;">
+                            <div style="display: flex; flex-direction: column; width: 70%;">
+                                <p style="margin: 0"><strong>Формальдегид:</strong> ${sensor.formaldehyde} µg/m³</p>
+                                Норма ВОЗ: ${WHO_NORMS.formaldehyde} µg/m³
+                            </div>
+                            <div style="width: 30%; display: flex; align-items: center; justify-content: end; text-align: end;">
+                                <em>${getPollutionStatus(sensor.formaldehyde, WHO_NORMS.formaldehyde)}</em>
+                            </div>
+                        </div>
+                        
+                
+                        <br />
+                        <div style="display: flex; justify-content: space-between">
+                            <strong>Итоговая оценка:</strong> 
+                            ${getFinalQualityLabel(calculateTotalScore(sensor))}
+                        </div>
+                    </div>
+                `);
             });
         }
 
@@ -268,10 +310,10 @@ export default function AirQualityMap() {
         <div style={styles.container}>
             <MapContainer 
                 center={mapCenter} 
-                zoom={11.5}
-                style={{ height: "500px", width: "100%", marginTop: "30px" }}
+                zoom={12}
+                style={{height: "600px", width: "100%"}}
                 scrollWheelZoom={false} // user can't zoom the map
-                dragging={false}    // user can't move the map
+                dragging={true}    // user can't move the map
                 zoomControl={false}
                 doubleClickZoom={false}
                 touchZoom={false}
@@ -291,34 +333,7 @@ export default function AirQualityMap() {
                 />
             </div>
             
-            {/* Section for showing the advanced information about the sensor */}
-            {selectedSensor && (
-                <div style={{ textAlign: "center", marginTop: "20px", padding: "15px 40px", background: "#f9f9f9", borderRadius: "8px", boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)" }}>
-                <h3>Подробная информация о датчике</h3>
-                <p><strong>ID датчика:</strong> {selectedSensor.sensorId}</p>
-                <br/>
-
-                <div style={styles.advancedInfoText}>
-                    <p><strong>SO₂:</strong> {selectedSensor.so2} µg/m³. Согласно ВОЗ, норма составляет {WHO_NORMS.so2} µg/m³.</p>
-                    <p><strong>{getPollutionStatus(selectedSensor.so2, WHO_NORMS.so2)}</strong></p>
-                </div>
-                <div style={styles.advancedInfoText}>
-                    <p><strong>CO:</strong> {selectedSensor.co} µg/m³. Согласно ВОЗ, норма составляет {WHO_NORMS.co} µg/m³.</p>
-                    <p><strong>{getPollutionStatus(selectedSensor.co, WHO_NORMS.co)}</strong></p>
-                </div>
-                <div style={styles.advancedInfoText}>
-                    <p><strong>NO₂:</strong> {selectedSensor.no2} µg/m³. Согласно ВОЗ, норма составляет {WHO_NORMS.no2} µg/m³.</p>
-                    <p><strong>{getPollutionStatus(selectedSensor.no2, WHO_NORMS.no2)}</strong></p>
-                </div>
-                <div style={styles.advancedInfoText}>
-                    <p><strong>Формальдегид:</strong> {selectedSensor.formaldehyde} µg/m³. Согласно ВОЗ, норма составляет {WHO_NORMS.formaldehyde} µg/m³.</p>
-                    <p><strong>{getPollutionStatus(selectedSensor.formaldehyde, WHO_NORMS.formaldehyde)}</strong></p>
-                </div>
-                <br/>
-                
-                <p><strong>Итоговая оценка:</strong> {getFinalQualityLabel(calculateTotalScore(selectedSensor))}</p>
-                </div>
-            )}
+            
         </div>
     );
 }
@@ -326,14 +341,15 @@ export default function AirQualityMap() {
 const styles = {
     container: {
         position: "relative",
+        padding: "10px 0"
     },
     calendar: {
         position: "absolute",
-        top: "5px",
-        right: "5px",
+        bottom: "0",
+        right: "0",
         zIndex: 1000,
         transform: "scale(0.7)",
-        transformOrigin: "top right",
+        transformOrigin: "bottom right",
     },
     advancedInfoText: {
         display: "flex",
