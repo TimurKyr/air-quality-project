@@ -20,33 +20,15 @@ export default function Weather() {
                     throw new Error("Failed to fetch weather data");
                 }
                 const data = await response.json();
-                
-                // Translation to show info in Russian
-                const weatherTranslation = {
-                    Clear: "Ясно",
-                    Clouds: "Облачно",
-                    Rain: "Дождь",
-                    Snow: "Снег",
-                    Drizzle: "Морось",
-                    Thunderstorm: "Гроза",
-                    Mist: "Туман",
-                    Fog: "Туман",
-                    Haze: "Легкий туман",
-                    Smoke: "Дымка",
-                    Dust: "Пыль",
-                    Sand: "Песок",
-                    Squall: "Шквал",
-                    Tornado: "Торнадо"
-                };
 
                 setWeatherData({
                     temperature: Math.round(data.main.temp),
                     windSpeed: Math.round(data.wind.speed),
-                    precipitation: weatherTranslation[data.weather[0].main] || "Неизвестно",
+                    precipitation: data.weather[0].main || "Unknown",
                     humidity: data.main.humidity,
                     sunrise: new Date(data.sys.sunrise * 1000).toLocaleTimeString("ru-RU"),
-                    sunset: new Date(data.sys.sunset * 1000).toLocaleTimeString("ru-RU"),
-                    description: weatherTranslation[data.weather[0].main] || "Неизвестно",
+                    sunset: new Date(data.sys.sunset * 1000).toLocaleTimeString("en-US"),
+                    description: data.weather[0].main || "Unknown",
                 });
                 setLoading(false);  // Weather is ready to show
             } catch (err) {
@@ -79,7 +61,7 @@ export default function Weather() {
                 <div style={styles.iconSection}>
                     <span style={styles.icon}>{WeatherIcons.wind}</span>
                     <div>
-                        <span style={styles.BigText}>{weatherData.windSpeed} км/ч</span>
+                        <span style={styles.BigText}>{weatherData.windSpeed} km/h</span>
                     </div>
                 </div>
             </div>
@@ -87,19 +69,19 @@ export default function Weather() {
             {/* Section with additional weather information */}
             <div style={styles.bottomSection}>
                 <div style={styles.bottomSectionText}>
-                    <p>Осадки:</p>
+                    <p>Precipitation:</p>
                     <p><strong>{weatherData.precipitation}</strong></p>
                 </div>
                 <div style={styles.bottomSectionText}>
-                    <p>Влажность:</p>
+                    <p>Humidity:</p>
                     <p><strong>{weatherData.humidity}%</strong></p>
                 </div>
                 <div style={styles.bottomSectionText}>
-                    <p>Время Восхода:</p>
+                    <p>Sunrise Time:</p>
                     <p><strong>{weatherData.sunrise}</strong></p>
                 </div>
                 <div style={styles.bottomSectionText}>
-                    <p>Время Заката:</p>
+                    <p>Sunset Time:</p>
                     <p><strong>{weatherData.sunset}</strong></p>
                 </div>
             </div>

@@ -61,15 +61,15 @@ const calculateTotalScore = (sensor) => {
 
 // Final label of the mark according to score
 function getFinalQualityLabel(score) {
-    if (score < 6) return "Ниже нормы";
-    if (score >= 6 && score < 10) return "Немного выше нормы";
-    return "Превышает норму";
+    if (score < 6) return "Below normal";
+    if (score >= 6 && score < 10) return "A little above normal";
+    return "Exceeds the norm";
 }
 
 function getPollutionStatus(value, norm) {
-    if (value < 0.8 * norm) return "Ниже нормы";
-    if (value >= 0.8 * norm && value < 1.2 * norm) return "Немного выше нормы";
-    return "Превышает норму";
+    if (value < 0.8 * norm) return "Below normal";
+    if (value >= 0.8 * norm && value < 1.2 * norm) return "A little above normal";
+    return "Exceeds the norm";
 }
 
 export default function AirQualityMap() {
@@ -129,10 +129,10 @@ export default function AirQualityMap() {
                 if (selectedSensor) {
                     const updatedSensor = formattedParsedData.find(sensor => sensor.sensorId === selectedSensor.sensorId);
                     if (updatedSensor) {
-                        console.log("✅ Updating selected sensor with new data:", updatedSensor);
+                        console.log("Updating selected sensor with new data:", updatedSensor);
                         setSelectedSensor(updatedSensor);
                     } else {
-                        console.warn("⚠️ Previously selected sensor is not available for the new date.");
+                        console.warn("Previously selected sensor is not available for the new date.");
                         setSelectedSensor(null);
                     }
                 }
@@ -159,7 +159,7 @@ export default function AirQualityMap() {
     // Runs when sensors' data was successfully fetched
     useEffect(() => {
         if (!map) {
-            console.warn("⚠️ mapRef.current is NULL. Waiting for initialization...");
+            console.warn("mapRef.current is NULL. Waiting for initialization...");
             return;
         }
 
@@ -225,6 +225,7 @@ export default function AirQualityMap() {
                     }, { sensor: null, distance: Infinity }).sensor;
 
                     if (closestSensor) {
+                        console.log("!!!!");
                         setSelectedSensor(closestSensor);
                     }
                 });
@@ -243,12 +244,12 @@ export default function AirQualityMap() {
                     zIndexOffset: 50
                 }).addTo(markerLayer).bindPopup(`
                     <div style="max-width: 300px; display: flex; flex-direction: column">
-                        <strong style="text-align: center;">Датчик ${sensor.sensorId}</strong><br />
+                        <strong style="text-align: center;">Sensor ${sensor.sensorId}</strong><br />
                         
                         <div style="display: flex; justify-content: space-between;">
                             <div style="display: flex; flex-direction: column; width: 70%;">
                                 <p style="margin: 0"><strong>SO₂:</strong> ${sensor.so2} µg/m³</p>
-                                Норма ВОЗ: ${WHO_NORMS.so2} µg/m³
+                                WHO norm: ${WHO_NORMS.so2} µg/m³
                             </div>
                             <div style="width: 30%; display: flex; align-items: center; justify-content: end; text-align: end;">
                                 <em>${getPollutionStatus(sensor.so2, WHO_NORMS.so2)}</em>
@@ -259,7 +260,7 @@ export default function AirQualityMap() {
                         <div style="display: flex; justify-content: space-between;">
                             <div style="display: flex; flex-direction: column; width: 70%;">
                                 <p style="margin: 0"><strong>CO:</strong> ${sensor.co} µg/m³</p>
-                                Норма ВОЗ: ${WHO_NORMS.co} µg/m³
+                                WHO norm: ${WHO_NORMS.co} µg/m³
                             </div>
                             <div style="width: 30%; display: flex; align-items: center; justify-content: end; text-align: end;">
                                 <em>${getPollutionStatus(sensor.co, WHO_NORMS.co)}</em>
@@ -270,7 +271,7 @@ export default function AirQualityMap() {
                         <div style="display: flex; justify-content: space-between;">
                             <div style="display: flex; flex-direction: column; width: 70%;">
                                 <p style="margin: 0"><strong>NO₂:</strong> ${sensor.no2} µg/m³</p>
-                                Норма ВОЗ: ${WHO_NORMS.no2} µg/m³
+                                WHO norm: ${WHO_NORMS.no2} µg/m³
                             </div>
                             <div style="width: 30%; display: flex; align-items: center; justify-content: end; text-align: end;">
                                 <em>${getPollutionStatus(sensor.no2, WHO_NORMS.no2)}</em>
@@ -281,8 +282,8 @@ export default function AirQualityMap() {
 
                         <div style="display: flex; justify-content: space-between;">
                             <div style="display: flex; flex-direction: column; width: 70%;">
-                                <p style="margin: 0"><strong>Формальдегид:</strong> ${sensor.formaldehyde} µg/m³</p>
-                                Норма ВОЗ: ${WHO_NORMS.formaldehyde} µg/m³
+                                <p style="margin: 0"><strong>Formaldehyde:</strong> ${sensor.formaldehyde} µg/m³</p>
+                                WHO norm: ${WHO_NORMS.formaldehyde} µg/m³
                             </div>
                             <div style="width: 30%; display: flex; align-items: center; justify-content: end; text-align: end;">
                                 <em>${getPollutionStatus(sensor.formaldehyde, WHO_NORMS.formaldehyde)}</em>
@@ -292,7 +293,7 @@ export default function AirQualityMap() {
                 
                         <br />
                         <div style="display: flex; justify-content: space-between">
-                            <strong>Итоговая оценка:</strong> 
+                            <strong>Final assessment:</strong> 
                             ${getFinalQualityLabel(calculateTotalScore(sensor))}
                         </div>
                     </div>

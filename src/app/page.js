@@ -14,7 +14,7 @@ export default function Home() {
       <div style={styles.row}>
         {/* Weather column */}
         <div style={styles.weatherColumn}>
-          <p style={styles.title}>ТЕКУЩАЯ ПОГОДА В АЛМАТЫ</p>
+          <p style={styles.title}>CURRENT WEATHER IN ALMATY</p>
           <div style={styles.centeredContent}>
             <Weather />
           </div>
@@ -22,7 +22,7 @@ export default function Home() {
 
         {/* Map column */}
         <div style={styles.mapColumn}>
-          <p style={styles.title}>КАРТА КАЧЕСТВА ВОЗДУХА АЛМАТЫ</p>
+          <p style={styles.title}>ALMATY AIR QUALITY MAP</p>
           <AirQualityMap />
         </div>
       </div>
